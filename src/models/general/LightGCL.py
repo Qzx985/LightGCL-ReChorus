@@ -5,6 +5,7 @@ import scipy.sparse as sp
 import torch.nn.functional as F
 from models.BaseModel import GeneralModel
 
+#参考LightGCN的实现来实现本模型
 class LightGCL(GeneralModel):
     reader = 'BaseReader'
     runner = 'BaseRunner'
@@ -12,12 +13,12 @@ class LightGCL(GeneralModel):
     @staticmethod
     def parse_model_args(parser):
         parser.add_argument('--decay', default=0.99, type=float, help='learning rate')
-        parser.add_argument('--lambda1', default=0.05, type=float, help='weight of cl loss')
         parser.add_argument('--d', default=64, type=int, help='embedding size')
         parser.add_argument('--q', default=5, type=int, help='rank')
         parser.add_argument('--gnn_layer', default=2, type=int, help='number of gnn layers')
         parser.add_argument('--temp', default=0.2, type=float, help='temperature in cl loss')
-        parser.add_argument('--lambda2', default=1e-5, type=float, help='l2 reg weight')
+        parser.add_argument('--lambda1', default=0.2, type=float, help='weight of cl loss')
+        parser.add_argument('--lambda2', default=1e-7, type=float, help='l2 reg weight')
         return GeneralModel.parse_model_args(parser)
 
     def __init__(self, args, corpus):
@@ -28,11 +29,12 @@ class LightGCL(GeneralModel):
         self.temp = args.temp
         self.lambda1 = args.lambda1
         self.lambda2 = args.lambda2
-        self.E_u_0 = nn.Parameter(nn.init.xavier_uniform_(torch.empty(corpus.n_users, self.emb_size)))
-        self.E_i_0 = nn.Parameter(nn.init.xavier_uniform_(torch.empty(corpus.n_items, self.emb_size)))
+        self.E_u_0 = nn.Parameter(nn.init.xavier_uniform_(torch.empty(corpus.n_users, self.emb_size)))#用户初始嵌入
+        self.E_i_0 = nn.Parameter(nn.init.xavier_uniform_(torch.empty(corpus.n_items, self.emb_size)))#物品初始嵌入
         
-        self.adj_norm = self.build_adjmat(corpus.n_users, corpus.n_items, corpus.train_clicked_set)
-        self.sparse_adj_norm = self.convert_sparse_matrix_to_tensor(self.adj_norm).to(torch.device(self.device))
+        self.adj_norm = self.build_adjmat(corpus.n_users, corpus.n_items, corpus.train_clicked_set)#邻接矩阵
+        self.sparse_adj_norm = self.convert_sparse_matrix_to_tensor(self.adj_norm).to(torch.device(self.device))#邻接矩阵的tensor表示
+        self.u_s, self.v_s, self.ut, self.vt = self.compute_svd(self.sparse_adj_norm, q=self.q)
 
     def build_adjmat(self, user_count, item_count, train_mat):
         R = sp.dok_matrix((user_count, item_count), dtype=np.float32)
@@ -70,7 +72,6 @@ class LightGCL(GeneralModel):
 
     def forward(self, feed_dict):
         uids, iids = feed_dict['user_id'], feed_dict['item_id']
-        u_s, v_s, ut, vt = self.compute_svd(self.sparse_adj_norm, q=self.q)
         
         E_u_list = [self.E_u_0]
         E_i_list = [self.E_i_0]
@@ -80,8 +81,8 @@ class LightGCL(GeneralModel):
             Z_u = torch.spmm(self.sparse_adj_norm, E_i_list[layer-1])
             Z_i = torch.spmm(self.sparse_adj_norm.T, E_u_list[layer-1])
 
-            G_u_list.append(u_s @ (vt @ E_i_list[layer-1]))
-            G_i_list.append(v_s @ (ut @ E_u_list[layer-1]))
+            G_u_list.append(self.u_s @ (self.vt @ E_i_list[layer-1]))
+            G_i_list.append(self.v_s @ (self.ut @ E_u_list[layer-1]))
 
             E_u_list.append(Z_u)
             E_i_list.append(Z_i)
