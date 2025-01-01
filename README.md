@@ -5,10 +5,11 @@ Original paper: [《LightGCL: Simple Yet Effective Graph Contrastive Learning fo
 
 ## Running the LightGCL Model
 - The LightGCL model is located at: ReChorus-master/src/models/general/LightGCL.py.
-- To run the LightGCL model, follow these steps:
-
-1. running `pip install -r requirements.txt`.
-2. running `python src/main.py --model_name LightGCL`.
+- To run the LightGCL model, you need to run the ipynb file in the data folder to obtain the corresponding dataset, and then run the following command 
+```bash
+pip install -r requirements.txt
+python src/main.py --model_name LightGCL
+```
    
 ## Models
 
