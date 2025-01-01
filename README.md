@@ -1,7 +1,8 @@
 # SYSY ML Course Project
 
 This README documents the reproduction of the LightGCL model in the ReChorus framework and its performance compared to BPRMF and LightGCN models on various datasets.\
-Original paper: [《LightGCL: Simple Yet Effective Graph Contrastive Learning for Recommendation》](https://openreview.net/forum?id=FKXVK9dyMM).
+Original paper: [《LightGCL: Simple Yet Effective Graph Contrastive Learning for Recommendation》](https://openreview.net/forum?id=FKXVK9dyMM).\
+Source code of the paper: [LightGCL](https://github.com/HKUDS/LightGCL)
 
 ## Running the LightGCL Model
 - The LightGCL model is located at: ReChorus-master/src/models/general/LightGCL.py.
