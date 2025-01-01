@@ -1,14 +1,14 @@
-# SYSY ML Homework
+# SYSY ML Course Project
 
-This README documents the reproduction of the LightGCL model in the ReChorus framework and its performance compared to BPRMF and LightGCN models on various datasets.
+This README documents the reproduction of the LightGCL model in the ReChorus framework and its performance compared to BPRMF and LightGCN models on various datasets.\
+Original paper: [《LightGCL: Simple Yet Effective Graph Contrastive Learning for Recommendation》](https://openreview.net/forum?id=FKXVK9dyMM).
 
 ## Running the LightGCL Model
 - The LightGCL model is located at: ReChorus-master/src/models/general/LightGCL.py.
 - To run the LightGCL model, follow these steps:
 
-1. Navigate to the `ReChorus-master` directory.
-2. running `pip install -r requirements.txt`.
-3. running `python src/main.py --model_name LightGCL`.
+1. running `pip install -r requirements.txt`.
+2. running `python src/main.py --model_name LightGCL`.
    
 ## Models
 
