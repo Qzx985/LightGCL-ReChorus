@@ -1,4 +1,4 @@
-# ML Homework
+# SYSY ML Homework
 
 This README documents the reproduction of the LightGCL model in the ReChorus framework and its performance compared to BPRMF and LightGCN models on various datasets.
 
